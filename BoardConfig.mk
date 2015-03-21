@@ -16,17 +16,11 @@
 
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_SMP := true
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_VARIANT := krait
 
 TARGET_NO_BOOTLOADER := true
-
-# Inline kernel building		
-TARGET_KERNEL_CONFIG := franco_defconfig		
-TARGET_KERNEL_SOURCE := kernel/moto/shamu		
-BOARD_KERNEL_IMAGE_NAME := zImage-dtb		
 
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE :=  2048
@@ -174,7 +168,13 @@ USE_DEVICE_SPECIFIC_CAMERA:= true
 
 BOARD_HAL_STATIC_LIBRARIES := libdumpstate.shamu
 
+# Time
+BOARD_USES_QC_TIME_SERVICES := true
+
 # Include an expanded selection of fonts
 EXTENDED_FONT_FOOTPRINT := true
 
--include vendor/motorola/shamu/BoardConfigVendor.mk
+# Enable workaround for slow rom flash
+BOARD_SUPPRESS_SECURE_ERASE := true
+
+-include vendor/moto/shamu/BoardConfigVendor.mk

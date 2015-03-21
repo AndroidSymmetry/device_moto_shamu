@@ -30,12 +30,12 @@
 #include <stdbool.h>
 
 #define LOG_TAG "PowerHAL"
+#define LOG_NDEBUG 0
 #include <utils/Log.h>
 
 #include <hardware/hardware.h>
 #include <hardware/power.h>
 
-#define TOUCH_INTERACTIVE_PATH "/sys/bus/i2c/devices/1-004a/tsp"
 #define STATE_ON "state=1"
 #define STATE_OFF "state=0"
 #define STATE_HDR_ON "state=2"
@@ -58,30 +58,6 @@ static void socket_init()
         client_addr.sun_family = AF_UNIX;
         snprintf(client_addr.sun_path, UNIX_PATH_MAX, BOOST_SOCKET);
     }
-}
-
-static int sysfs_write(const char *path, char *s)
-{
-    char buf[80];
-    int len;
-    int fd = open(path, O_WRONLY);
-
-    if (fd < 0) {
-        strerror_r(errno, buf, sizeof(buf));
-        ALOGE("Error opening %s: %s\n", path, buf);
-        return -1;
-    }
-
-    len = write(fd, s, strlen(s));
-    if (len < 0) {
-        strerror_r(errno, buf, sizeof(buf));
-        ALOGE("Error writing to %s: %s\n", path, buf);
-        close(fd);
-        return -1;
-    }
-
-    close(fd);
-    return 0;
 }
 
 static void power_init(__attribute__((unused)) struct power_module *module)
@@ -112,7 +88,7 @@ static void coresonline(int off)
     }
 
     if (rc < 0) {
-        ALOGE("%s: failed to send: %s", __func__, strerror(errno));
+        //ALOGE("%s: failed to send: %s", __func__, strerror(errno));
     }
 }
 
@@ -140,7 +116,7 @@ static void enc_boost(int off)
     }
 
     if (rc < 0) {
-        ALOGE("%s: failed to send: %s", __func__, strerror(errno));
+        //ALOGE("%s: failed to send: %s", __func__, strerror(errno));
     }
 }
 
@@ -191,7 +167,7 @@ static void touch_boost()
     rc = sendto(client_sockfd, data, strlen(data), 0,
         (const struct sockaddr *)&client_addr, sizeof(struct sockaddr_un));
     if (rc < 0) {
-        ALOGE("%s: failed to send: %s", __func__, strerror(errno));
+        //ALOGE("%s: failed to send: %s", __func__, strerror(errno));
     }
 }
 
@@ -212,13 +188,13 @@ static void low_power(int on)
         snprintf(data, MAX_LENGTH, "10:%d", client);
         rc = sendto(client_sockfd, data, strlen(data), 0, (const struct sockaddr *)&client_addr, sizeof(struct sockaddr_un));
         if (rc < 0) {
-            ALOGE("%s: failed to send: %s", __func__, strerror(errno));
+            //ALOGE("%s: failed to send: %s", __func__, strerror(errno));
         }
     } else {
         snprintf(data, MAX_LENGTH, "9:%d", client);
         rc = sendto(client_sockfd, data, strlen(data), 0, (const struct sockaddr *)&client_addr, sizeof(struct sockaddr_un));
         if (rc < 0) {
-            ALOGE("%s: failed to send: %s", __func__, strerror(errno));
+            //ALOGE("%s: failed to send: %s", __func__, strerror(errno));
         }
     }
 }
@@ -236,8 +212,6 @@ static void process_low_power_hint(void* data)
 
 static void power_set_interactive(__attribute__((unused)) struct power_module *module, int on)
 {
-    sysfs_write(TOUCH_INTERACTIVE_PATH, on ? "AUTO" : "ON");
-
     if (last_state == -1) {
         last_state = on;
     } else {
@@ -262,7 +236,7 @@ static void power_hint( __attribute__((unused)) struct power_module *module,
 {
     switch (hint) {
         case POWER_HINT_INTERACTION:
-            ALOGV("POWER_HINT_INTERACTION");
+            //ALOGV("POWER_HINT_INTERACTION");
             touch_boost();
             break;
 #if 0

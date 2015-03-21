@@ -19,6 +19,17 @@
 #
 # Everything in this directory will become public
 
+
+ifeq ($(TARGET_PREBUILT_KERNEL),)
+LOCAL_KERNEL := device/moto/shamu-kernel/zImage-dtb
+else
+LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
+endif
+
+
+PRODUCT_COPY_FILES := \
+    $(LOCAL_KERNEL):kernel
+
 PRODUCT_COPY_FILES += \
     device/moto/shamu/init.shamu.rc:root/init.shamu.rc \
     device/moto/shamu/init.shamu.power.rc:root/init.shamu.power.rc \
@@ -152,7 +163,20 @@ PRODUCT_PACKAGES += \
     libaudio-resampler
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.audio.monitorRotation=true
+    ro.audio.monitorRotation=true \
+    fmas.spkr_6ch=35,20,110 \
+    fmas.spkr_2ch=35,25 \
+    fmas.spkr_angles=10 \
+    fmas.spkr_sgain=0 \
+    media.aac_51_output_enabled=true \
+    drm.service.enabled=true \
+    persist.audio.dualmic.config=endfire \
+    persist.audio.fluence.voicecall=true \
+    persist.audio.fluence.voicerec=false \
+    persist.audio.fluence.speaker=false \
+    persist.radio.sib16_support=1 \
+    persist.data.qmi.adb_logmask=0
+    
 
 # Audio effects
 PRODUCT_PACKAGES += \
@@ -235,6 +259,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.radio.fsg_reload_on=1 \
     persist.radio.mcfg_enabled=1
+
+# Allow tethering without provisioning app
+PRODUCT_PROPERTY_OVERRIDES += \
+    net.tethering.noprovisioning=true
 
 # Camera configuration
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
